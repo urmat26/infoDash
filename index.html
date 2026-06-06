@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InfoDash — Информационная панель</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <div class="logo">Info<span>Dash</span></div>
+  <div class="header-right">
+    <div class="refresh-bar-wrap">
+      <div class="dot pulsing" id="statusDot"></div>
+      <div class="refresh-track"><div class="refresh-fill" id="refreshFill"></div></div>
+      <span id="statusText" style="white-space:nowrap">загрузка</span>
+    </div>
+    <button class="theme-btn" onclick="toggleTheme()">☀ / ☾</button>
+  </div>
+</header>
+
+<div class="grid">
+
+  <!-- CLOCK -->
+  <div class="widget widget--clock">
+    <div class="widget-label">⏱ часы реального времени <span class="spin"></span></div>
+    <div class="clock-display">
+      <div class="clock-time">
+        <span id="ch">00</span><span class="clock-colon">:</span><span id="cm">00</span>
+      </div>
+      <div class="clock-right">
+        <div class="clock-date" id="clockDate">—</div>
+        <div class="clock-day" id="clockDay">—</div>
+        <div class="sec-ring-wrap">
+          <svg class="sec-ring" viewBox="0 0 32 32">
+            <circle class="sec-bg" cx="16" cy="16" r="13" />
+            <circle class="sec-fg" id="secArc" cx="16" cy="16" r="13"
+              stroke-dasharray="81.68" stroke-dashoffset="0"/>
+          </svg>
+          <div class="clock-secs">:<span id="cs">00</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WEATHER -->
+  <div class="widget widget--weather">
+    <div class="widget-label">🌤 погода · бишкек <span class="spin"></span></div>
+    <div id="weatherContent">
+      <div class="skeleton" style="width:55%;height:52px;border-radius:10px"></div>
+      <div class="skeleton" style="width:80%"></div>
+      <div class="skeleton" style="width:55%"></div>
+    </div>
+  </div>
+
+  <!-- CURRENCY -->
+  <div class="widget widget--currency">
+    <div class="widget-label">💱 курсы валют <span class="spin"></span></div>
+    <div class="curr-meta" id="currMeta">загрузка...</div>
+    <div class="currency-grid" id="currencyContent">
+      <div class="skeleton" style="height:86px;border-radius:12px"></div>
+      <div class="skeleton" style="height:86px;border-radius:12px"></div>
+      <div class="skeleton" style="height:86px;border-radius:12px"></div>
+    </div>
+  </div>
+
+  <!-- NEWS -->
+  <div class="widget widget--news">
+    <div class="widget-label">📰 новости <span class="spin"></span></div>
+    <div class="news-tabs">
+      <button class="news-tab active" onclick="switchNews(0,this)">Все</button>
+      <button class="news-tab" onclick="switchNews(1,this)">Tech</button>
+      <button class="news-tab" onclick="switchNews(2,this)">Мир</button>
+    </div>
+    <div id="newsContent">
+      <div class="skeleton"></div>
+      <div class="skeleton" style="width:85%"></div>
+      <div class="skeleton" style="width:70%"></div>
+    </div>
+  </div>
+
+  <!-- FACT -->
+  <div class="widget widget--fact">
+    <div class="widget-label">💡 факт дня</div>
+    <div class="fact-text" id="factText">Загрузка...</div>
+    <button class="fact-btn" onclick="loadFact()">
+      <span class="icon">↻</span> новый факт
+    </button>
+  </div>
+
+  <!-- CHART -->
+  <div class="widget widget--chart">
+    <div class="widget-label">📊 прогноз погоды <span class="spin"></span></div>
+    <div class="chart-tabs">
+      <button class="chart-tab active" onclick="switchChart('line',this)">Линейный</button>
+      <button class="chart-tab" onclick="switchChart('bar',this)">Столбчатый</button>
+    </div>
+    <div class="chart-wrapper"><canvas id="weatherChart"></canvas></div>
+  </div>
+
+</div>
+
+<script src="config.js"></script>
+<script src="widgets/clock.js"></script>
+<script src="widgets/weather.js"></script>
+<script src="widgets/currency.js"></script>
+<script src="widgets/news.js"></script>
+<script src="chart-setup.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

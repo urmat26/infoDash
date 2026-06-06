@@ -1,0 +1,107 @@
+let refreshTimer = null;
+let refreshRemain = CONFIG.UPDATE_INTERVAL;
+
+function toggleTheme(){
+  const h = document.documentElement;
+  h.dataset.theme = h.dataset.theme==='dark'?'light':'dark';
+  if(weatherChart) updateChartTheme();
+}
+
+function flashWidget(widget){
+  widget.classList.add('updating');
+  setTimeout(()=>widget.classList.remove('updating'), 800);
+}
+
+function flashAll(){
+  document.querySelectorAll('.widget').forEach(w=>flashWidget(w));
+}
+
+function animateIn(el){
+  el.classList.remove('flip');
+  void el.offsetWidth;
+  el.classList.add('flip');
+}
+
+function setStatus(state, text){
+  const dot = document.getElementById('statusDot');
+  const label = document.getElementById('statusText');
+  dot.className = 'dot' + (state==='ok'?' pulsing':state==='loading'?' loading':' error');
+  label.textContent = text;
+}
+
+function startRefreshBar(){
+  clearInterval(refreshTimer);
+  refreshRemain = CONFIG.UPDATE_INTERVAL;
+  const fill = document.getElementById('refreshFill');
+  fill.style.transition = 'none';
+  fill.style.width = '100%';
+  setTimeout(()=>{
+    fill.style.transition = `width ${CONFIG.UPDATE_INTERVAL}s linear`;
+    fill.style.width = '0%';
+  }, 50);
+  refreshTimer = setInterval(()=>{
+    refreshRemain--;
+    if(refreshRemain <= 0) clearInterval(refreshTimer);
+    document.getElementById('statusText').textContent =
+      refreshRemain > 0 ? `обн через ${refreshRemain}с` : 'обновление...';
+  }, 1000);
+}
+
+const RU_FACTS = [
+  'Осьминоги имеют три сердца и голубую кровь — в ней медь вместо железа.',
+  'Мёд не портится. В египетских пирамидах находили мёд возрастом 3000 лет — съедобный.',
+  'Банан — технически ягода, а клубника — нет. Авокадо тоже ягода.',
+  'Человек — единственное животное, которое краснеет от смущения.',
+  'Кошки не чувствуют сладкого вкуса — у них нет нужных рецепторов.',
+  'Гусеница полностью растворяется внутри кокона, прежде чем стать бабочкой.',
+  'Молния ударяет в Землю около 100 раз каждую секунду.',
+  'Акулы старше деревьев: акулы — 400 млн лет, деревья — 350 млн.',
+  'Мозг потребляет 20% энергии тела, хотя весит лишь 2%.',
+  'Кальмары имеют самые большие глаза среди животных — до 30 см в диаметре.',
+  'В теле человека больше бактерий, чем собственных клеток.',
+  'Сердце кита бьётся около 2 раз в минуту во время погружения.',
+  'Золото есть в крови человека — около 0.2 мг в теле взрослого.',
+  'Слоны — единственные крупные животные, которые не умеют прыгать.',
+  'Мурашки по коже — рудиментарный рефлекс: шерсть поднималась, чтобы казаться больше.',
+  'Клетки тела обновляются примерно за 7–10 лет.',
+  'Паук-павлин исполняет уникальный танец для каждой самки.',
+  'Снежинки падают со скоростью около 5 км/ч.',
+  'На Луне тише, чем в анэхоидной камере — там нет атмосферы для звука.',
+  'Мёртвое море настолько солёное, что в нём невозможно утонуть.',
+];
+
+let lastFactIdx = -1;
+function loadFact(){
+  let idx;
+  do { idx = Math.floor(Math.random()*RU_FACTS.length); } while(idx===lastFactIdx);
+  lastFactIdx = idx;
+  const el = document.getElementById('factText');
+  el.style.opacity = '0';
+  el.style.transform = 'translateY(6px)';
+  setTimeout(()=>{
+    el.textContent = `"${RU_FACTS[idx]}"`;
+    el.style.transition = 'opacity 0.4s, transform 0.4s';
+    el.style.opacity = '1';
+    el.style.transform = 'none';
+  }, 200);
+  return true;
+}
+
+async function updateAll(){
+  setStatus('loading','обновление...');
+  flashAll();
+  const results = await Promise.allSettled([
+    loadWeather(), loadCurrency(), loadNews(), loadFact()
+  ]);
+  const ok = results.every(r=>r.status==='fulfilled'&&r.value!==false);
+  setStatus(ok?'ok':'error', ok?'обн через...':'частичные ошибки');
+  startRefreshBar();
+}
+
+updateClock();
+setInterval(updateClock, 1000);
+
+window.addEventListener('load', async ()=>{
+  await updateAll();
+  setInterval(updateAll, CONFIG.UPDATE_INTERVAL * 1000);
+});
