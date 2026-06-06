@@ -7,20 +7,72 @@ function updateWeatherChart(daily){
   renderChart(currentChartType);
 }
 
+const WEATHER_GROUPS = {
+  '☀️ Ясно':       {codes: [0],                 color: '#fbbf24'},
+  '⛅ Облачно':     {codes: [1,2,3],             color: '#a78bfa'},
+  '🌫 Туман':       {codes: [45,48],             color: '#94a3b8'},
+  '🌧 Дождь':       {codes: [51,53,55,56,57,61,63,65,66,67,80,81,82], color: '#60a5fa'},
+  '❄️ Снег':        {codes: [71,73,75,77,85,86], color: '#e2e8f0'},
+  '⛈ Гроза':        {codes: [95,96,99],           color: '#f87171'},
+};
+
+function groupWeatherCodes(codes){
+  const counts = {};
+  for (const key in WEATHER_GROUPS) counts[key] = 0;
+  codes.forEach(code => {
+    for (const [label, group] of Object.entries(WEATHER_GROUPS)){
+      if (group.codes.includes(code)) { counts[label]++; return; }
+    }
+  });
+  return Object.entries(counts).filter(([,v]) => v > 0);
+}
+
 function renderChart(type){
   const isDark = document.documentElement.dataset.theme==='dark';
-  const gridColor = isDark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.07)';
   const textColor = isDark?'rgba(240,240,248,0.5)':'rgba(8,8,16,0.45)';
   if(!chartDailyData) return;
 
+  if(weatherChart){ weatherChart.destroy(); weatherChart=null; }
+  const ctx = document.getElementById('weatherChart').getContext('2d');
+
+  if (type === 'pie'){
+    const grouped = groupWeatherCodes(chartDailyData.weathercode);
+    weatherChart = new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels: grouped.map(([l]) => l),
+        datasets: [{
+          data: grouped.map(([,v]) => v),
+          backgroundColor: grouped.map(([l]) => WEATHER_GROUPS[l].color),
+          borderColor: isDark ? '#111118' : '#ffffff',
+          borderWidth: 2,
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        animation: {duration: 600, easing: 'easeInOutQuart'},
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {color: textColor, font: {family: "'Space Mono'", size: 10}, boxWidth: 12, padding: 14}
+          },
+          tooltip: {
+            callbacks: {
+              label: ctx => ` ${ctx.parsed} дн.`
+            }
+          }
+        }
+      }
+    });
+    return;
+  }
+
+  const gridColor = isDark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.07)';
   const labels = chartDailyData.time.map(d=>{
     const dt = new Date(d);
     return dt.toLocaleDateString('ru',{weekday:'short',day:'numeric'});
   });
 
-  if(weatherChart){ weatherChart.destroy(); weatherChart=null; }
-
-  const ctx = document.getElementById('weatherChart').getContext('2d');
   weatherChart = new Chart(ctx,{
     type,
     data:{

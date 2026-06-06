@@ -10,7 +10,7 @@ async function loadWeather(){
   const w = document.querySelector('.widget--weather');
   flashWidget(w);
   try{
-    const url=`https://api.open-meteo.com/v1/forecast?latitude=${CONFIG.CITY_LAT}&longitude=${CONFIG.CITY_LON}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code&daily=temperature_2m_max,temperature_2m_min&timezone=Asia%2FBishkek&forecast_days=7`;
+    const url=`https://api.open-meteo.com/v1/forecast?latitude=${CONFIG.CITY_LAT}&longitude=${CONFIG.CITY_LON}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=Asia%2FBishkek&forecast_days=7`;
     const res = await fetch(url);
     if(!res.ok) throw new Error(res.status);
     const data = await res.json();
