@@ -6,28 +6,32 @@ async function loadGitHub(){
   flashWidget(w);
   const signal = window.__abortSignal;
   try{
-    const [repoRes, commitsRes] = await Promise.all([
+    const [repoRes, commitsRes, contribRes] = await Promise.all([
       fetch('https://api.github.com/repos/urmat26/infoDash', {signal}),
-      fetch('https://api.github.com/repos/urmat26/infoDash/commits?per_page=1', {signal})
+      fetch('https://api.github.com/repos/urmat26/infoDash/commits?per_page=1', {signal}),
+      fetch('https://api.github.com/repos/urmat26/infoDash/contributors?per_page=1&anon=true', {signal})
     ]);
     if (!repoRes.ok) throw new Error(repoRes.status);
     if (!commitsRes.ok) throw new Error(commitsRes.status);
+    if (!contribRes.ok) throw new Error(contribRes.status);
 
     const data = await repoRes.json();
-    const link = commitsRes.headers.get('Link');
-    const commitCount = link ? (parseInt(link.match(/page=(\d+)>; rel="last"/)?.[1]) || 1) : 1;
+    const commitLink = commitsRes.headers.get('Link');
+    const commitCount = commitLink ? (parseInt(commitLink.match(/page=(\d+)>; rel="last"/)?.[1]) || 1) : 1;
+    const contribLink = contribRes.headers.get('Link');
+    const contribCount = contribLink ? (parseInt(contribLink.match(/page=(\d+)>; rel="last"/)?.[1]) || 1) : 1;
 
-    const cacheData = {data, commitCount, ts: Date.now()};
+    const cacheData = {data, commitCount, contribCount, ts: Date.now()};
     localStorage.setItem(GITHUB_CACHE_KEY, JSON.stringify(cacheData));
 
-    renderGitHub(data, commitCount, false);
+    renderGitHub(data, commitCount, contribCount, false);
     return true;
   }catch(e){
     if (e.name === 'AbortError') return false;
     const cache = localStorage.getItem(GITHUB_CACHE_KEY);
     if (cache) {
-      const {data, commitCount} = JSON.parse(cache);
-      renderGitHub(data, commitCount, true);
+      const {data, commitCount, contribCount} = JSON.parse(cache);
+      renderGitHub(data, commitCount, contribCount || 0, true);
     } else {
       document.getElementById('githubContent').innerHTML = '<div class="widget-error">⚠ Нет данных</div>';
     }
@@ -35,7 +39,7 @@ async function loadGitHub(){
   }
 }
 
-function renderGitHub(data, commitCount, stale){
+function renderGitHub(data, commitCount, contribCount, stale){
   document.getElementById('githubContent').innerHTML = `
     <div class="github-stats">
       <div class="github-stat">
@@ -53,6 +57,10 @@ function renderGitHub(data, commitCount, stale){
       <div class="github-stat">
         <div class="github-num">${commitCount}</div>
         <div class="github-label">📝 коммитов</div>
+      </div>
+      <div class="github-stat">
+        <div class="github-num">${contribCount}</div>
+        <div class="github-label">👥 контрибьюторов</div>
       </div>
     </div>
     <div class="github-meta"${stale ? ' style="color:var(--red)"' : ''}>
