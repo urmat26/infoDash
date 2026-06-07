@@ -69,7 +69,7 @@ async function changeCity(city){
     CONFIG.CITY_LON = r.longitude;
     localStorage.setItem('infodash_city', JSON.stringify({name: r.name, lat: r.latitude, lon: r.longitude}));
     document.querySelector('.widget--weather .widget-label').innerHTML =
-      `🌤 погода · ${r.name.toLowerCase()} <span class="spin"></span>`;
+      `🌤 погода · ${r.name.toLowerCase()} <span class="spin"></span><span class="city-edit" onclick="changeCity(prompt('Введи город:'))" title="Сменить город">✏</span>`;
     await loadWeather();
   }catch(e){
     if (e.name !== 'AbortError') alert('Ошибка поиска города');
@@ -84,6 +84,6 @@ function restoreCity(){
     CONFIG.CITY_LAT = c.lat;
     CONFIG.CITY_LON = c.lon;
     document.querySelector('.widget--weather .widget-label').innerHTML =
-      `🌤 погода · ${c.name.toLowerCase()} <span class="spin"></span>`;
+      `🌤 погода · ${c.name.toLowerCase()} <span class="spin"></span><span class="city-edit" onclick="changeCity(prompt('Введи город:'))" title="Сменить город">✏</span>`;
   }
 }
