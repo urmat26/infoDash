@@ -1,7 +1,4 @@
-# API keys & secrets (create config.js from config.example.js)
-config.js
-
-# Environment files
+# Environment files (пока не используется, но на будущее)
 .env
 .env.local
 
