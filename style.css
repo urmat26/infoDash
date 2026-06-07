@@ -17,20 +17,20 @@
   --transition: 0.3s cubic-bezier(0.4,0,0.2,1);
 }
 [data-theme="light"] {
-  --bg: #f0f0f5;
+  --bg: #f4f4f9;
   --bg2: #ffffff;
-  --bg3: #e8e8f0;
-  --border: rgba(0,0,0,0.08);
-  --border2: rgba(0,0,0,0.15);
-  --text: #080810;
-  --text2: rgba(8,8,16,0.48);
-  --accent: #5040d0;
-  --accent2: #c0305a;
-  --green: #16a34a;
-  --amber: #c97008;
-  --red: #dc2626;
-  --blue: #2563eb;
-  --purple: #7c3aed;
+  --bg3: #e9e8f0;
+  --border: rgba(0,0,0,0.07);
+  --border2: rgba(0,0,0,0.14);
+  --text: #1a1a2e;
+  --text2: rgba(26,26,46,0.45);
+  --accent: #6c5ce7;
+  --accent2: #e84393;
+  --green: #00b894;
+  --amber: #e17055;
+  --red: #d63031;
+  --blue: #0984e3;
+  --purple: #a29bfe;
 }
 
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -135,10 +135,16 @@ header {
   transition:border-color 0.25s, transform 0.25s, box-shadow 0.25s;
   cursor:default;
 }
+[data-theme="light"] .widget {
+  box-shadow:0 2px 12px rgba(0,0,0,0.04);
+}
 .widget:hover {
   border-color:var(--border2);
   transform:translateY(-2px);
   box-shadow:0 8px 32px rgba(0,0,0,0.25);
+}
+[data-theme="light"] .widget:hover {
+  box-shadow:0 6px 24px rgba(0,0,0,0.10);
 }
 
 .widget::before {
@@ -158,17 +164,20 @@ header {
   background:linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.04) 50%, transparent 60%);
   animation:shine 0.7s ease forwards;
 }
+[data-theme="light"] .widget.updating::after {
+  background:linear-gradient(105deg, transparent 40%, rgba(0,0,0,0.03) 50%, transparent 60%);
+}
 @keyframes shine {
   from{transform:translateX(-100%)}
   to{transform:translateX(100%)}
 }
 
-.widget--clock    { --ab:#7c6aff; grid-column:span 2; }
-.widget--weather  { --ab:#60a5fa; }
-.widget--currency { --ab:#4ade80; grid-column:span 2; }
-.widget--news     { --ab:#ff6a9b; }
-.widget--chart    { --ab:#fbbf24; grid-column:span 3; }
-.widget--fact     { --ab:#a78bfa; }
+.widget--clock    { --ab:var(--accent); grid-column:span 2; }
+.widget--weather  { --ab:var(--blue); }
+.widget--currency { --ab:var(--green); grid-column:span 2; }
+.widget--news     { --ab:var(--accent2); }
+.widget--chart    { --ab:var(--amber); grid-column:span 3; }
+.widget--fact     { --ab:var(--purple); }
 
 .widget-label {
   font-size:10px;
