@@ -1,0 +1,10 @@
+# API keys & secrets (create config.js from config.example.js)
+config.js
+
+# Environment files
+.env
+.env.local
+
+# OS files
+.DS_Store
+Thumbs.db
